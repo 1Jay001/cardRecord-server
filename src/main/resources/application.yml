@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: cardRecord
+  datasource:
+    url: jdbc:mysql://120.26.167.3:3306/cardRecord
+    username: thaddeus
+    password: fsy0809
+    driver-class-name: com.mysql.cj.jdbc.Driver
+server:
+  port: 8088
