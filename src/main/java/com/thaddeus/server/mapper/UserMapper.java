@@ -1,5 +1,7 @@
 package com.thaddeus.server.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.thaddeus.pojo.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -9,5 +11,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @Version: 1.0
  */
 @Mapper
-public class UserMapper {
+public interface UserMapper extends BaseMapper<User> {
 }

@@ -6,5 +6,10 @@ spring:
     username: thaddeus
     password: fsy0809
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:/mapper/**.xml
 server:
   port: 8088

@@ -1,5 +1,7 @@
 package com.thaddeus.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+//@TableName("`user`")
 public class User {
 
     private Long userId;
@@ -22,7 +25,7 @@ public class User {
 
     private String nickName;
 
-    private String avatarURL;
+    private String avatarUrl;
 
     private LocalDateTime createTime;
 
