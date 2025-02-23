@@ -13,3 +13,29 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/**.xml
 server:
   port: 8088
+
+logging:
+  level:
+    com:
+      thaddeus:
+        server:
+          mapper: debug
+          service: info
+          controller: info
+
+wechat:
+  miniapp:
+    jscode2session-url: https://api.weixin.qq.com/sns/jscode2session
+    appid: wxe0882ca2e1fc1ba9
+    secret: cede831eb1571f6bf30820f9844890b0
+    grant-type: authorization_code
+
+thaddeus:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: 9jG8lx22
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+
