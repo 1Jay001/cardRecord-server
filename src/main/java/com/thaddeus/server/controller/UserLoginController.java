@@ -5,12 +5,12 @@ import com.thaddeus.common.constant.JwtClaimsConstant;
 import com.thaddeus.common.constant.UserInfoConstant;
 import com.thaddeus.common.properties.JwtProperties;
 import com.thaddeus.common.result.Result;
+import com.thaddeus.common.result.ResultCodeEnum;
 import com.thaddeus.common.utils.HttpClientUtil;
 import com.thaddeus.common.utils.JwtUtil;
 import com.thaddeus.pojo.dto.UserLoginDTO;
 import com.thaddeus.pojo.dto.UserResponseDTO;
 import com.thaddeus.pojo.entity.User;
-import com.thaddeus.server.service.UserLoginService;
 import com.thaddeus.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,6 @@ import java.util.HashMap;
 @RequestMapping("login")
 @Slf4j
 public class UserLoginController {
-
-    @Autowired
-    private UserLoginService userLoginService;
 
     @Autowired
     private UserService userService;
@@ -70,6 +67,9 @@ public class UserLoginController {
 
         String sessionKey = jsonObject.get("session_key").toString();
         String openid = jsonObject.get("openid").toString();
+
+        // 第3步，返回给前端
+
         // 2. 存放到user_wechat表中
         /*WeChatEntity weChatEntity = new WeChatEntity(null, openid, sessionKey);
         userLoginService.addWechat(weChatEntity);*/
@@ -98,8 +98,7 @@ public class UserLoginController {
                 .token(token)
                 .userInfo(userInfo)
                 .build();
-        // TODO: 返回给前端的code=1, message=null
-        return Result.success(userResponseDTO);
+        return Result.build(userResponseDTO, ResultCodeEnum.SUCCESS);
     }
 
     private static HashMap<String, String> getUserInfo(User user) {

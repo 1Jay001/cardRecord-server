@@ -10,6 +10,7 @@ import com.thaddeus.pojo.entity.WeChatEntity;
  */
 public interface UserLoginService {
 
+
     /**
      * 获取openid和session_key添加到user_wechat表中
      * @param weChatEntity

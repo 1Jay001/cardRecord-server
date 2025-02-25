@@ -2,37 +2,67 @@ package com.thaddeus.common.result;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
- * 后端统一返回结果
- * @param <T>
+ * @program:guigu-oa-parent
+ * @author: 1Jay001
+ * @Time: 2023/5/15  17:20
+ * @description: 统一结果返回类
  */
 @Data
-public class Result<T> implements Serializable {
+public class Result<T> {
+    /**
+     * 1、状态码
+     * 2、返回信息
+     * 3、数据
+     */
+    private Integer code;
+    private String message;
+    private T data;
 
-    private Integer code; //编码：1成功，0和其它数字为失败
-    private String msg; //错误信息
-    private T data; //数据
+    // 构造私有化
+    private Result() {}
 
-    public static <T> Result<T> success() {
-        Result<T> result = new Result<T>();
-        result.code = 1;
+    // 封装返回数据
+    public static <T> Result<T> build(T body, ResultCodeEnum resultCodeEnum) {
+        Result<T> result = new Result<>();
+        // 封装数据
+        if(body != null) {
+            result.setData(body);
+        }
+
+        // 状态码
+        result.setCode(resultCodeEnum.getCode());
+        // 返回信息
+        result.setMessage(resultCodeEnum.getMessage());
         return result;
     }
 
-    public static <T> Result<T> success(T object) {
-        Result<T> result = new Result<T>();
-        result.data = object;
-        result.code = 1;
-        return result;
+    // 成功
+    public static<T> Result<T> ok() {
+        return build(null,ResultCodeEnum.SUCCESS);
     }
 
-    public static <T> Result<T> error(String msg) {
-        Result result = new Result();
-        result.msg = msg;
-        result.code = 0;
-        return result;
+    public static<T> Result<T> ok(T data) {
+        return build(data, ResultCodeEnum.SUCCESS);
+    }
+
+    // 失败
+    public static<T> Result<T> fail() {
+        return build(null, ResultCodeEnum.FAIL);
+    }
+
+    public static<T> Result<T> fail(T data) {
+        return build(data, ResultCodeEnum.FAIL);
+    }
+
+    public Result<T> message(String msg) {
+        this.setMessage(msg);
+        return this;
+    }
+
+    public Result<T> code(Integer code) {
+        this.setCode(code);
+        return this;
     }
 
 }

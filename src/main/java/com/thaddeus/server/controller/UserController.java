@@ -37,7 +37,7 @@ public class UserController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 //        LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
         userService.addUser(user);
-        return Result.success();
+        return Result.ok();
     }
 
 

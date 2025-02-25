@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
         } else {
             // openid为空，新增用户
             User user = new User();
-            // TODO: 设置创建时间
+            // TODO: 设置创建时间 使用拦截器对createTime等字段自动补充
             userMapper.insert(user);
             return user;
         }
