@@ -1,5 +1,8 @@
 package com.thaddeus.server.controller;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSONObject;
 import com.thaddeus.common.constant.JwtClaimsConstant;
 import com.thaddeus.common.constant.UserInfoConstant;
@@ -29,7 +32,7 @@ import java.util.HashMap;
  * @Version: 1.0
  */
 @RestController
-@RequestMapping("login")
+@RequestMapping("/user")
 @Slf4j
 public class UserLoginController {
 
@@ -52,7 +55,7 @@ public class UserLoginController {
     private String grantType;
 
 
-    @PostMapping()
+    @PostMapping("/login")
     public Result userLogin(@RequestBody UserLoginDTO userLoginDTO) {
         log.info(userLoginDTO.getCode());
         // 1. 获取openid和session_key
@@ -61,41 +64,25 @@ public class UserLoginController {
         map.put("secret", secretKey);
         map.put("js_code", userLoginDTO.getCode());
         map.put("grant_type", grantType);
-        String result = HttpClientUtil.doGet(url, map);
+        String result = HttpClientUtil.doGet(url, map); // TODO 前端传入js_code不正确导致空指针异常，需要抛出异常
         log.info("result: {}", result);
         JSONObject jsonObject = JSONObject.parseObject(result);
 
         String sessionKey = jsonObject.get("session_key").toString();
         String openid = jsonObject.get("openid").toString();
 
-        // 第3步，返回给前端
-
-        // 2. 存放到user_wechat表中
-        /*WeChatEntity weChatEntity = new WeChatEntity(null, openid, sessionKey);
-        userLoginService.addWechat(weChatEntity);*/
-
         // 根据openid查询用户是否存在
-        User user = userService.selectByOpenId(openid);
+        Result<User> userResult = userService.selectByOpenId(openid);
+        User user = userResult.getData();
 
-        /**
-         * 正确的流程应该是，当用户首次通过微信登录时，系统应该先检查是否存在对应的openid记录。
-         * 如果不存在，先创建user表的记录，生成user_id，然后将该user_id和openid一起插入到wechat表中。
-         * 如果用户已经存在，则直接关联已有的user_id。
-         */
-
-        // 2. jwt加密
-        HashMap<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.USER_ID, user.getUserId());
-        String token = JwtUtil.createJWT(
-                jwtProperties.getAdminSecretKey(),
-                jwtProperties.getAdminTtl(),
-                claims);
-        log.info("token:{}", token);
+        StpUtil.login(user.getUserId());
+        String saToken = StpUtil.getTokenValue();
+        log.info("saTokenInfo: {}", StpUtil.getTokenInfo());
 
         HashMap<String, String> userInfo = getUserInfo(user);
         // 3. 封装token和用户信息返回给前端
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()
-                .token(token)
+                .token(saToken)
                 .userInfo(userInfo)
                 .build();
         return Result.build(userResponseDTO, ResultCodeEnum.SUCCESS);

@@ -1,5 +1,7 @@
 package com.thaddeus.server.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.thaddeus.common.result.Result;
 import com.thaddeus.pojo.entity.User;
 import com.thaddeus.pojo.entity.WeChatEntity;
 
@@ -22,5 +24,13 @@ public interface UserService {
      * @param openId 一个openid对应一个用户
      * @return
      */
-    User selectByOpenId(String openId);
+    Result<User> selectByOpenId(String openId);
+
+    /**
+     * 根据userId查询用户
+     * @param userId
+     * @return
+     */
+    Result<User> selectByUserId(String userId);
+
 }

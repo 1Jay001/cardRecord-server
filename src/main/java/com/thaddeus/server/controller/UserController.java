@@ -5,6 +5,7 @@ import com.thaddeus.common.utils.HttpClientUtil;
 import com.thaddeus.pojo.dto.UserLoginDTO;
 import com.thaddeus.pojo.entity.User;
 import com.thaddeus.server.service.UserService;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,16 @@ public class UserController {
 //        LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
         userService.addUser(user);
         return Result.ok();
+    }
+
+    /**
+     * @param userId
+     * @return
+     */
+    @GetMapping("/list")
+    public Result getUser(@PathParam("user_id") String userId) {
+        Result<User> result = userService.selectByUserId(userId);
+        return Result.ok(result);
     }
 
 
