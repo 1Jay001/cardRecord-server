@@ -1,5 +1,7 @@
 package com.thaddeus.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.thaddeus.common.constant.RoomConstant;
 import com.thaddeus.common.context.BaseContext;
@@ -43,5 +45,13 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
         // TODO JOIN_TIME LEFT_TIME使用自动填充
         RoomUser roomUser = new RoomUser(null, roomId, userId, null, null);
         roomUserMapper.insert(roomUser);
+    }
+
+    public void quitRoom(Long roomId) {
+        Room room = roomMapper.selectById(roomId);
+        UpdateWrapper<Room> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("room_id", roomId)
+                        .set("room_status", RoomConstant.DISABLE);
+        int row = roomMapper.update(room, updateWrapper);
     }
 }

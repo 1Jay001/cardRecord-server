@@ -13,4 +13,6 @@ import com.thaddeus.server.annotation.AutoFill;
  */
 public interface RoomService extends IService<Room> {
     void createRoom(Long userId);
+
+    void quitRoom(Long roomId);
 }
