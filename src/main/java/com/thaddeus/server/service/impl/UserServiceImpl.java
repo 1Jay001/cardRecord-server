@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public Result<User> selectByUserId(String userId) {
+    public Result<User> selectByUserId(Long userId) {
         if (userId != null) {
             User user = userMapper.selectById(userId);
             return Result.build(user, ResultCodeEnum.SUCCESS);

@@ -46,7 +46,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/list")
-    public Result getUser(@PathParam("user_id") String userId) {
+    public Result getUser(@PathParam("user_id") Long userId) {
         Result<User> result = userService.selectByUserId(userId);
         return Result.ok(result);
     }

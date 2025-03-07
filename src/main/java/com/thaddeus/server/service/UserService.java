@@ -31,6 +31,6 @@ public interface UserService {
      * @param userId
      * @return
      */
-    Result<User> selectByUserId(String userId);
+    Result<User> selectByUserId(Long userId);
 
 }
