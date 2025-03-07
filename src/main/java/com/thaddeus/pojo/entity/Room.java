@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * @Author: copper
  * @CreateTime: 2025-03-06
@@ -25,4 +27,13 @@ public class Room {
     private Integer roomSize;
 
     private Integer roomStatus;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
+
+    private Long createUser;
+
+    private Long updateUser;
+
 }

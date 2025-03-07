@@ -2,11 +2,13 @@ package com.thaddeus.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.thaddeus.common.enumeration.OperationType;
 import com.thaddeus.common.exception.BaseException;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.common.result.ResultCodeEnum;
 import com.thaddeus.pojo.entity.User;
 import com.thaddeus.pojo.entity.WeChatEntity;
+import com.thaddeus.server.annotation.AutoFill;
 import com.thaddeus.server.mapper.UserMapper;
 import com.thaddeus.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,7 @@ public class UserServiceImpl implements UserService {
         } else {
             // openid为空，新增用户
             User user = new User();
-            // TODO: 设置创建时间 使用拦截器对createTime等字段自动补充
+            user.setCreateTime(LocalDateTime.now());
             userMapper.insert(user);
             return Result.build(user, ResultCodeEnum.SUCCESS);
         }

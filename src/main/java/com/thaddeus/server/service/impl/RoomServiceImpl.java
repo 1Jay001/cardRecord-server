@@ -1,6 +1,8 @@
 package com.thaddeus.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.thaddeus.common.constant.RoomConstant;
+import com.thaddeus.common.context.BaseContext;
 import com.thaddeus.pojo.entity.Room;
 import com.thaddeus.pojo.entity.RoomUser;
 import com.thaddeus.pojo.entity.User;
@@ -34,8 +36,8 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
     public void createRoom(Long userId) {
         User user = userService.selectByUserId(userId).getData();
         String roomName = user.getNickName()+"的房间";
-        Room room = new Room(null, roomName, null, 1);
-        int insert = roomMapper.insert(room);
+        Room room = new Room(null, roomName, RoomConstant.CAPACITY, RoomConstant.ENABLE, null, null, null, null);
+        roomMapper.createRoom(room);
         Long roomId = room.getRoomId();
 
         // TODO JOIN_TIME LEFT_TIME使用自动填充

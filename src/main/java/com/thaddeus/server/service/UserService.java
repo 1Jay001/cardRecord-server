@@ -1,9 +1,11 @@
 package com.thaddeus.server.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.thaddeus.common.enumeration.OperationType;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.pojo.entity.User;
 import com.thaddeus.pojo.entity.WeChatEntity;
+import com.thaddeus.server.annotation.AutoFill;
 
 /**
  * @Author: copper

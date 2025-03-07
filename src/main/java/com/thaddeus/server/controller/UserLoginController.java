@@ -6,6 +6,7 @@ import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSONObject;
 import com.thaddeus.common.constant.JwtClaimsConstant;
 import com.thaddeus.common.constant.UserInfoConstant;
+import com.thaddeus.common.context.BaseContext;
 import com.thaddeus.common.properties.JwtProperties;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.common.result.ResultCodeEnum;
@@ -74,7 +75,6 @@ public class UserLoginController {
         // 根据openid查询用户是否存在
         Result<User> userResult = userService.selectByOpenId(openid);
         User user = userResult.getData();
-
         StpUtil.login(user.getUserId());
         String saToken = StpUtil.getTokenValue();
         log.info("saTokenInfo: {}", StpUtil.getTokenInfo());
