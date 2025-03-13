@@ -7,6 +7,7 @@ import com.thaddeus.pojo.entity.User;
 import com.thaddeus.server.annotation.AutoFill;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 
 /**
  * @Author: copper
@@ -18,6 +19,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface RoomMapper extends BaseMapper<Room> {
 
     @AutoFill(OperationType.INSERT)
+    @Options(useGeneratedKeys = true, keyProperty = "roomId")
     @Insert("insert into room(room_id, room_name, room_size, room_status, create_time, create_user, update_time, update_user)" +
             "values (#{roomId}, #{roomName}, #{roomSize}, #{roomStatus}, #{createTime}, #{createUser}, #{updateTime}, #{updateUser})")
     void createRoom(Room room);
