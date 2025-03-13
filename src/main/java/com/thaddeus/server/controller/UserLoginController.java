@@ -1,17 +1,12 @@
 package com.thaddeus.server.controller;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSONObject;
-import com.thaddeus.common.constant.JwtClaimsConstant;
 import com.thaddeus.common.constant.UserInfoConstant;
-import com.thaddeus.common.context.BaseContext;
 import com.thaddeus.common.properties.JwtProperties;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.common.result.ResultCodeEnum;
 import com.thaddeus.common.utils.HttpClientUtil;
-import com.thaddeus.common.utils.JwtUtil;
 import com.thaddeus.pojo.dto.UserLoginDTO;
 import com.thaddeus.pojo.dto.UserResponseDTO;
 import com.thaddeus.pojo.entity.User;

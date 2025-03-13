@@ -1,18 +1,13 @@
 package com.thaddeus.server.controller;
 
 import com.thaddeus.common.result.Result;
-import com.thaddeus.common.utils.HttpClientUtil;
-import com.thaddeus.pojo.dto.UserLoginDTO;
+import com.thaddeus.common.result.ResultCodeEnum;
+import com.thaddeus.pojo.dto.UserDTO;
 import com.thaddeus.pojo.entity.User;
 import com.thaddeus.server.service.UserService;
-import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 
 /**
  * @Author: copper
@@ -35,22 +30,32 @@ public class UserController {
      */
     @PostMapping
     public Result addUser(@RequestBody User user) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-//        LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
         userService.addUser(user);
         return Result.ok();
     }
 
     /**
+     * 根据用户id获取用户信息
      * @param userId
      * @return
      */
     @GetMapping("/list")
-    public Result getUser(@PathParam("user_id") Long userId) {
-        Result<User> result = userService.selectByUserId(userId);
-        return Result.ok(result);
+    public Result getUser(@RequestParam Long userId) {
+        User user = userService.selectByUserId(userId).getData();
+        return Result.build(user, ResultCodeEnum.SUCCESS);
     }
 
-
+    /**
+     * 修改用户信息
+     * @param userDTO {useId, avatarUrl, nickName}
+     * @return
+     */
+    @PostMapping("/updateInfo")
+    public Result updateUserInfo(@RequestBody UserDTO userDTO) {
+        if (userService.updateUser(userDTO).getCode() != 200) {
+            return Result.fail();
+        }
+        return Result.ok();
+    }
 
 }
