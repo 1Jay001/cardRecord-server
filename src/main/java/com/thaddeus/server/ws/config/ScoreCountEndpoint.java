@@ -1,5 +1,7 @@
 package com.thaddeus.server.ws.config;
 
+import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.thaddeus.common.utils.MessageUtils;
 import com.thaddeus.server.ws.pojo.Message;
@@ -99,9 +101,11 @@ public class ScoreCountEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
+//        SaSession CurrentSession = StpUtil.getSession();
+//        session = (Session) CurrentSession;
         //1,从onlineUsers中删除当前用户的session对象，表示当前用户下线了
         String user = (String) this.httpSession.getAttribute("user"); // TODO Caused by: java.lang.NullPointerException: Cannot invoke "jakarta.servlet.http.HttpSession.getAttribute(String)" because "this.httpSession" is null
-
+        
         onlineUsers.remove(user);
         //2,通知其他所有的用户，当前用户下线了
         String message = MessageUtils.getMessage(true,null, getFriends());

@@ -2,12 +2,6 @@ package com.thaddeus.common.result;
 
 import lombok.Data;
 
-/**
- * @program:guigu-oa-parent
- * @author: 1Jay001
- * @Time: 2023/5/15  17:20
- * @description: 统一结果返回类
- */
 @Data
 public class Result<T> {
     /**

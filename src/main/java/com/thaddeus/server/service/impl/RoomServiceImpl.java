@@ -7,6 +7,7 @@ import com.thaddeus.common.constant.RoomConstant;
 import com.thaddeus.common.exception.BaseException;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.common.result.ResultCodeEnum;
+import com.thaddeus.pojo.dto.JoinRoomDTO;
 import com.thaddeus.pojo.entity.Room;
 import com.thaddeus.pojo.entity.RoomUser;
 import com.thaddeus.pojo.entity.User;
@@ -15,6 +16,7 @@ import com.thaddeus.server.mapper.RoomMapper;
 import com.thaddeus.server.mapper.RoomUserMapper;
 import com.thaddeus.server.service.RoomService;
 import com.thaddeus.server.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,15 +73,18 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
         return null;
     }
 
-    public Result<RoomVO> getRoomInfo() {
-        return null;
+    public Room getRoomInfo(Long roomId) {
+        /**
+         * 1、判断roomId是否为空，如果为空则无法加入该房间
+         * 2. 判断room状态是否可用
+         */
+        if (roomId == null) {
+            return null;
+        }
+        Room room = roomMapper.selectById(roomId);
+        if (room.getRoomStatus().equals(0)) {
+            throw new BaseException(201, "房间不可用");
+        }
+        return room;
     }
-
-    public Result joinRoom(Long userId) {
-
-        return null;
-    }
-
-
-
 }

@@ -2,12 +2,6 @@ package com.thaddeus.common.result;
 
 import lombok.Getter;
 
-/**
- * @program:guigu-oa-parent
- * @author: 1Jay001
- * @Time: 2023/5/15  17:17
- * @description:
- */
 @Getter
 public enum ResultCodeEnum {
     SUCCESS(200, "成功"),
@@ -17,6 +11,7 @@ public enum ResultCodeEnum {
     NO_PERMISSION(205, "没有权限"),
     NOEXIST_USER(206, "用户不存在"),
     FAIL_CREATEROOM(207, "创建房间失败"),
+    ROOM_NON_EXISTENT(208, "房间不存在")
 
     ;
 

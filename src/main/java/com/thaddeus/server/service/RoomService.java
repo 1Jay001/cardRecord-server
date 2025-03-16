@@ -3,6 +3,7 @@ package com.thaddeus.server.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.thaddeus.common.enumeration.OperationType;
 import com.thaddeus.common.result.Result;
+import com.thaddeus.pojo.dto.JoinRoomDTO;
 import com.thaddeus.pojo.entity.Room;
 import com.thaddeus.pojo.vo.RoomVO;
 import com.thaddeus.server.annotation.AutoFill;
@@ -28,15 +29,10 @@ public interface RoomService extends IService<Room> {
     Result quitRoom(Long roomId);
 
     /**
-     * 获取房间信息
-     * @return
+     * 用户加入房间后获取房间信息
+     * @return JoinRoomDTO
      */
-    Result<RoomVO> getRoomInfo();
+    Room getRoomInfo(Long roomId);
 
-    /**
-     * 用户加入房间
-     * @param userId
-     * @return
-     */
-    Result joinRoom(Long userId);
+
 }

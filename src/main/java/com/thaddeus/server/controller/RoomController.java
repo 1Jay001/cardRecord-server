@@ -1,11 +1,18 @@
 package com.thaddeus.server.controller;
 
 import com.thaddeus.common.result.Result;
+import com.thaddeus.common.result.ResultCodeEnum;
 import com.thaddeus.pojo.entity.Room;
+import com.thaddeus.pojo.entity.User;
+import com.thaddeus.pojo.vo.RoomVO;
 import com.thaddeus.server.service.RoomService;
+import com.thaddeus.server.service.RoomUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Author: copper
@@ -20,6 +27,9 @@ public class RoomController {
 
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private RoomUserService roomUserService;
 
     /**
      * 通过userId创建房间
@@ -53,13 +63,27 @@ public class RoomController {
         return Result.ok(room);
     }
 
+    /**
+     * 用户加入房间
+     * 验证权限、更新房间成员列表、记录用户加入时间
+     * 返回完整的房间信息（包含成员列表、房间配置等）
+     * @param roomId
+     * @return JoinRoomVO
+     */
     @PostMapping("/join")
-    public Result joinRoom(@RequestParam Long userId) {
-
-        return Result.ok();
+    public Result<RoomVO> joinRoom(Long roomId) {
+        if (roomId == null) {
+            return Result.build(null, ResultCodeEnum.ROOM_NON_EXISTENT);
+        }
+        Room roomInfo = roomService.getRoomInfo(roomId);
+        RoomVO roomVO = new RoomVO();
+        BeanUtils.copyProperties(roomInfo, roomVO);
+        // 获取房间成员
+        List<User> userListByRoomId = roomUserService.getUserListByRoomId(roomId);
+        roomVO.setMembers(userListByRoomId);
+        roomVO.setStatus(roomInfo.getRoomStatus());
+        return Result.build(roomVO, ResultCodeEnum.SUCCESS);
     }
-
-
 
 
 }

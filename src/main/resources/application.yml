@@ -53,7 +53,7 @@ logging:
 wechat:
   miniapp:
     jscode2session-url: ${wechat.jscode2session-url}
-    appid: ${wechat.miniapp.appid}
+    appid: ${wechat.appid}
     secret: ${wechat.secret}
     grant-type: ${wechat.grant-type}
 
