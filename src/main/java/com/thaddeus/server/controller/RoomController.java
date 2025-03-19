@@ -33,12 +33,16 @@ public class RoomController {
 
     /**
      * 通过userId创建房间
+     * 同一个用户只能创建一个房间，在房间未关闭的情况下不能创建另一个房间
      */
-    @GetMapping()
+    @PostMapping()
     public Result<Room> addRoom() {
         Room room = roomService.createRoom();
         return Result.ok(room);
     }
+    /**
+     * 用户加入房间接口优化  明确房间的状态，不可用的房间无法加入
+     */
 
     /**
      * 通过roomId使room逻辑删除

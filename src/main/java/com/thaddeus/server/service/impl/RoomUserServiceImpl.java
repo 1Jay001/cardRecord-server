@@ -40,7 +40,7 @@ public class RoomUserServiceImpl extends ServiceImpl<RoomUserMapper, RoomUser> i
             return userList;
         }
         log.error("roomId为空");
-       return null;
+       return null; // TODO 避免空指针异常
     }
 
 }

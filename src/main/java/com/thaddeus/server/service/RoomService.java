@@ -17,7 +17,9 @@ import com.thaddeus.server.annotation.AutoFill;
 public interface RoomService extends IService<Room> {
 
     /**
-     * 创建房间
+     * 创建房间: 一个用户能创建多个房间，一个房间只能有一个被创建者
+     * 1. 后端从token获取userId，前端不必传入userId
+     * 2. 在房间未被正确退出时，无法继续创建房间
      */
     @AutoFill(OperationType.INSERT)
     Room createRoom();
