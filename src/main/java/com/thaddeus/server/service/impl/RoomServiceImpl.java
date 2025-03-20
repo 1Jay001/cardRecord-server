@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @Author: copper
@@ -104,5 +103,19 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
             throw new BaseException(201, "房间不可用");
         }
         return room;
+    }
+
+    public Boolean canBeAdd(Long roomId) {
+        // TODO 后期校验 roomSize, 超过房间人数不可加入
+
+        Room room = roomMapper.selectById(roomId);
+        if (room != null) {
+            Integer roomStatus = room.getRoomStatus();
+            if (roomStatus == RoomConstant.ENABLE) {
+                return true;
+            }
+            return false;
+        }
+        throw new BaseException(208, "房间不存在");
     }
 }

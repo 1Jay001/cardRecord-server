@@ -40,9 +40,6 @@ public class RoomController {
         Room room = roomService.createRoom();
         return Result.ok(room);
     }
-    /**
-     * 用户加入房间接口优化  明确房间的状态，不可用的房间无法加入
-     */
 
     /**
      * 通过roomId使room逻辑删除
@@ -69,24 +66,28 @@ public class RoomController {
 
     /**
      * 用户加入房间
-     * 验证权限、更新房间成员列表、记录用户加入时间
+     * 验证权限、更新房间成员列表、记录用户加入时间、明确房间的状态，不可用的房间无法加入
      * 返回完整的房间信息（包含成员列表、房间配置等）
      * @param roomId
      * @return JoinRoomVO
      */
     @PostMapping("/join")
     public Result<RoomVO> joinRoom(Long roomId) {
-        if (roomId == null) {
+        if (roomId == null ) {
             return Result.build(null, ResultCodeEnum.ROOM_NON_EXISTENT);
         }
-        Room roomInfo = roomService.getRoomInfo(roomId);
-        RoomVO roomVO = new RoomVO();
-        BeanUtils.copyProperties(roomInfo, roomVO);
-        // 获取房间成员
-        List<User> userListByRoomId = roomUserService.getUserListByRoomId(roomId);
-        roomVO.setMembers(userListByRoomId);
-        roomVO.setStatus(roomInfo.getRoomStatus());
-        return Result.build(roomVO, ResultCodeEnum.SUCCESS);
+        Boolean canBeAdd = roomService.canBeAdd(roomId);
+        if (canBeAdd) {
+            Room roomInfo = roomService.getRoomInfo(roomId);
+            RoomVO roomVO = new RoomVO();
+            BeanUtils.copyProperties(roomInfo, roomVO);
+            // 获取房间成员
+            List<User> userListByRoomId = roomUserService.getUserListByRoomId(roomId);
+            roomVO.setMembers(userListByRoomId);
+            roomVO.setStatus(roomInfo.getRoomStatus());
+            return Result.build(roomVO, ResultCodeEnum.SUCCESS);
+        }
+        return Result.build(null, ResultCodeEnum.ROOM_CANNOT_JOIN);
     }
 
 

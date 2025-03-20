@@ -37,4 +37,10 @@ public interface RoomService extends IService<Room> {
     Room getRoomInfo(Long roomId);
 
 
+    /**
+     * 根据roomId检查room是否可以被加入
+     * @param roomId
+     * @return
+     */
+    Boolean canBeAdd(Long roomId);
 }

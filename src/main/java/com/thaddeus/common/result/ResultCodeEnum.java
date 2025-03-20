@@ -11,8 +11,8 @@ public enum ResultCodeEnum {
     NO_PERMISSION(205, "没有权限"),
     NOEXIST_USER(206, "用户不存在"),
     FAIL_CREATEROOM(207, "创建房间失败"),
-    ROOM_NON_EXISTENT(208, "房间不存在")
-
+    ROOM_NON_EXISTENT(208, "房间不存在"),
+    ROOM_CANNOT_JOIN(209, "房间不能加入"),
     ;
 
     private Integer code;
