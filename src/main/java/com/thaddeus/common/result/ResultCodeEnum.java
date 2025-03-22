@@ -13,6 +13,8 @@ public enum ResultCodeEnum {
     FAIL_CREATEROOM(207, "创建房间失败"),
     ROOM_NON_EXISTENT(208, "房间不存在"),
     ROOM_CANNOT_JOIN(209, "房间不能加入"),
+    FAIL_QUITTROOM(210, "退出房间失败"),
+    FAIL_ADDLEFTIME(211, "添加用户离开房间的时间失败")
     ;
 
     private Integer code;

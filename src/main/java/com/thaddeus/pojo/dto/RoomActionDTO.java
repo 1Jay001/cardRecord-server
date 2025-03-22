@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JoinRoomDTO {
+public class RoomActionDTO {
 
     private Long roomId;
 

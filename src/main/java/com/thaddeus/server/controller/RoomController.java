@@ -48,8 +48,11 @@ public class RoomController {
      */
     @PostMapping("/quit")
     public Result quitRoom(@RequestParam Long roomId) {
-        roomService.quitRoom(roomId);
-        return Result.ok();
+        if (roomId != null) {
+            roomService.quitRoom(roomId);
+            return Result.ok();
+        }
+        return Result.fail(ResultCodeEnum.ROOM_NON_EXISTENT);
     }
 
 
