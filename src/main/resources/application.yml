@@ -56,6 +56,11 @@ wechat:
     appid: ${wechat.appid}
     secret: ${wechat.secret}
     grant-type: ${wechat.grant-type}
+  accessToken:
+    url: ${wechat.accessToken-url}
+    grant-type: ${wechat.grant-type-accessToken}
+
+
 
 sa-token:
   # token 名称（同时也是 cookie 名称）
