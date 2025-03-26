@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 /**
@@ -64,19 +65,24 @@ public class UserLoginController {
         String result = HttpClientUtil.doGet(url, map); // TODO 前端传入js_code不正确导致空指针异常，需要抛出异常
         log.info("result: {}", result);
         JSONObject jsonObject = JSONObject.parseObject(result);
-
         String sessionKey = jsonObject.get("session_key").toString();
         String openid = jsonObject.get("openid").toString();
-
         // 2. 根据openid查询用户是否存在
-        Result<User> userResult = userService.selectByOpenId(openid);
-        User user = userResult.getData();
+        User user = userService.selectByOpenId(openid).getData();
+        boolean isNew = false;
+        if (user == null) {
+            // 新增用户并记录创建日志
+            user = new User(null, openid, null, null, LocalDateTime.now(), null);
+            userService.addUser(user);
+            log.info("新用户创建，userId：{}", user.getUserId());
+            isNew = true;
+        }
         StpUtil.login(user.getUserId());
         String saToken = StpUtil.getTokenValue();
         log.info("saTokenInfo: {}", StpUtil.getTokenInfo());
 
-        HashMap<String, String> userInfo = getUserInfo(user);
-        // 3. 封装token和用户信息返回给前端
+        // 根据用户是否为新用户来决定是否返回详细用户信息
+        HashMap<String, String> userInfo = isNew ? null : getUserInfo(user);
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()
                 .token(saToken)
                 .userInfo(userInfo)
