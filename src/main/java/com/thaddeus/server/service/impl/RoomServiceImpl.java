@@ -59,28 +59,31 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
                .select(Room::getRoomId, Room::getRoomStatus, Room::getCreateTime);
         List<Room> roomIdsListBySameCreator = roomMapper.selectList(wrapper);
 
-        if (roomIdsListBySameCreator.size() == 0) {
-            // 不存在未关闭的房间 -> 创建房间
+        RoomUser roomUser = new RoomUser(null, null, currentId, LocalDateTime.now(), null);
+        if (roomIdsListBySameCreator.size() == 0 ) {
             roomMapper.createRoom(room); // 主键回显
             Long roomId = room.getRoomId();
-            RoomUser roomUser = new RoomUser(null, roomId, currentId, LocalDateTime.now(), null);
-            int insert = roomUserMapper.insert(roomUser);
-            if (insert == 0) {
-                throw new BaseException(207, "创建房间失败"); // TODO 异常处理有待改进
-            }
-            Room savedRoom = roomMapper.selectById(roomId);
-            return savedRoom;
+            roomUser.setRoomId(roomId);
         } else {
-            // 返回最新的未关闭的房间 TODO: 对之前未关闭的房间进行处理
             Optional<Long> optional = roomIdsListBySameCreator.stream()
                     .filter(r -> r.getRoomStatus().equals(RoomConstant.ENABLE))
                     .filter(r -> r.getCreateTime() != null)
                     .max(Comparator.comparing(Room::getCreateTime))
                     .map(Room::getRoomId);
-            Long latestDisableRoomId = optional.get();
-            Room latestDisableRoom = roomMapper.selectById(latestDisableRoomId);
-            return latestDisableRoom;
+            Long latestDisableRoomId = optional.orElseGet(() -> {
+                roomMapper.createRoom(room); // 主键回显
+                Long roomId = room.getRoomId();
+                return roomId;
+            });
+            roomUser.setRoomId(latestDisableRoomId);
         }
+        int insert = roomUserMapper.insert(roomUser);
+        if (insert == 0) {
+            throw new BaseException(207, "创建房间失败"); // TODO 异常处理有待改进
+        }
+        Room finalRoom = roomMapper.selectById(roomUser.getRoomId());
+        return finalRoom;
+
 
     }
 
@@ -131,4 +134,5 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
         }
         throw new BaseException(208, "房间不存在");
     }
+
 }

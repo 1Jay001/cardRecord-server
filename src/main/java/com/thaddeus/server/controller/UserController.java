@@ -1,5 +1,6 @@
 package com.thaddeus.server.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.common.result.ResultCodeEnum;
 import com.thaddeus.pojo.dto.UserDTO;

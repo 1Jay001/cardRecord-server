@@ -3,6 +3,7 @@ package com.thaddeus.server.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.thaddeus.common.constant.UserInfoConstant;
+import com.thaddeus.common.exception.BaseException;
 import com.thaddeus.common.properties.JwtProperties;
 import com.thaddeus.common.result.Result;
 import com.thaddeus.common.result.ResultCodeEnum;
@@ -14,6 +15,7 @@ import com.thaddeus.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +37,9 @@ public class UserLoginController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -65,35 +70,46 @@ public class UserLoginController {
         String result = HttpClientUtil.doGet(url, map); // TODO 前端传入js_code不正确导致空指针异常，需要抛出异常
         log.info("result: {}", result);
         JSONObject jsonObject = JSONObject.parseObject(result);
-        String sessionKey = jsonObject.get("session_key").toString();
-        String openid = jsonObject.get("openid").toString();
-        // 2. 根据openid查询用户是否存在
-        User user = userService.selectByOpenId(openid).getData();
-        boolean isNew = false;
-        if (user == null) {
-            // 新增用户并记录创建日志
-            user = new User(null, openid, null, null, LocalDateTime.now(), null);
-            userService.addUser(user);
-            log.info("新用户创建，userId：{}", user.getUserId());
-            isNew = true;
-        }
-        StpUtil.login(user.getUserId());
-        String saToken = StpUtil.getTokenValue();
-        log.info("saTokenInfo: {}", StpUtil.getTokenInfo());
+        Object errCode = jsonObject.get("errcode");
+        if (errCode != null) {
+            Object errMsg = jsonObject.get("errmsg");
+            throw new BaseException((Integer) errCode, errMsg.toString());
+        } else {
+            String sessionKey = jsonObject.get("session_key").toString();
+            String openid = jsonObject.get("openid").toString();
+            // 保存到redis
+            redisTemplate.opsForValue().set(UserInfoConstant.OPEN_ID, openid);
+            redisTemplate.opsForValue().set(UserInfoConstant.SESSION_KEY, sessionKey);
+            // 2. 根据openid查询用户是否存在
+            User user = userService.selectByOpenId(openid).getData();
+            boolean isNew = false;
+            if (user == null) {
+                // 新增用户并记录创建日志
+                user = new User(null, openid, null, null, LocalDateTime.now(), null);
+                userService.addUser(user);
+                log.info("新用户创建，userId：{}", user.getUserId());
+                isNew = true;
+            }
+            StpUtil.login(user.getUserId());
+            String saToken = StpUtil.getTokenValue();
+            log.info("saTokenInfo: {}", StpUtil.getTokenInfo());
 
-        // 根据用户是否为新用户来决定是否返回详细用户信息
-        HashMap<String, String> userInfo = isNew ? null : getUserInfo(user);
-        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
-                .token(saToken)
-                .userInfo(userInfo)
-                .build();
-        return Result.build(userResponseDTO, ResultCodeEnum.SUCCESS);
+            // 根据用户是否为新用户来决定是否返回详细用户信息
+            HashMap<String, String> userInfo = isNew ? null : getUserInfo(user);
+            UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                    .token(saToken)
+                    .userInfo(userInfo)
+                    .build();
+            return Result.build(userResponseDTO, ResultCodeEnum.SUCCESS);
+        }
+
     }
 
     private static HashMap<String, String> getUserInfo(User user) {
         HashMap<String, String> userInfo = new HashMap<>();
         userInfo.put(UserInfoConstant.USER_ID, String.valueOf(user.getUserId()));
         userInfo.put(UserInfoConstant.OPEN_ID, user.getOpenId());
+        // TODO sessionKey加密传输到前端
         userInfo.put(UserInfoConstant.NICK_NAME, user.getNickName());
         userInfo.put(UserInfoConstant.AVATAR_URL, user.getAvatarUrl());
         userInfo.put(UserInfoConstant.CREATE_TIME, String.valueOf(user.getCreateTime()));

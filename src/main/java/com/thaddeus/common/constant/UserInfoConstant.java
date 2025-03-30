@@ -10,6 +10,7 @@ public class UserInfoConstant {
 
     public static final String USER_ID = "userId";
     public static final String OPEN_ID = "openId";
+    public static final String SESSION_KEY = "sessionKey";
     public static final String NICK_NAME = "nickName";
     public static final String AVATAR_URL = "avatarUrl";
     public static final String CREATE_TIME = "createTime";
