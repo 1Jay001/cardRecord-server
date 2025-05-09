@@ -8,6 +8,7 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,10 +34,8 @@ public class ScoreCountEndpoint {
      */
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-        // 修改4: 从配置中获取 SaToken 验证后的用户ID（由 SaTokenWebSocketConfigurator 存入）
+        // 1. 获取并验证用户身份
         this.loginId = (String) config.getUserProperties().get("loginId");
-
-        // 修改5: 直接使用 SaToken 的会话校验（确保用户已登录）
         if (!StpUtil.isLogin(this.loginId)) {
             try {
                 session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "未授权连接"));
@@ -46,32 +45,55 @@ public class ScoreCountEndpoint {
             }
         }
 
-        // 修改6: 存储 WebSocket Session，键改为 SaToken 的 loginId
+        // 2. 处理重复连接（关闭旧会话）
+        Session existingSession = onlineUsers.get(this.loginId);
+        if (existingSession != null && existingSession.isOpen()) {
+            try {
+                existingSession.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 3. 存储新会话
         onlineUsers.put(this.loginId, session);
 
-        // 广播在线用户列表
-        String message = MessageUtils.getSysMessage(true, getOnlineUsers());
-        broadcastAllUsers(message);
+        // 4. 向新用户发送初始化数据（init）
+        sendInitMessage(session);
 
-//        sendScoreUpdate(loginId);
+        // 5. 向其他用户广播新增用户（add）
+        broadcastAddMessage(this.loginId);
     }
 
-    // 修改7: 方法名更贴切，获取在线用户列表
+    /**
+     * 向新用户发送初始化消息（全量数据）
+     */
+    private void sendInitMessage(Session session) {
+        try {
+            String initMsg = MessageUtils.getSysMessage("init", getOnlineUsers());
+            session.getBasicRemote().sendText(initMsg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public Set<String> getOnlineUsers() {
         return onlineUsers.keySet();
     }
 
-    // 广播消息逻辑保持不变
-    private void broadcastAllUsers(String message) {
-        try {
-            for (Session session : onlineUsers.values()) {
-                if (session.isOpen()) {
-                    session.getBasicRemote().sendText(message);
+    /**
+     * 向其他用户广播新增用户（增量数据）
+     */
+    private void broadcastAddMessage(String newUserId) {
+        String addMsg = MessageUtils.getSysMessage("add", Collections.singleton(newUserId));
+        onlineUsers.forEach((userId, session) -> {
+            if (!userId.equals(newUserId) && session.isOpen()) { // 排除自己
+                try {
+                    session.getBasicRemote().sendText(addMsg);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     /**
@@ -120,12 +142,24 @@ public class ScoreCountEndpoint {
      */
     @OnClose
     public void onClose(Session session) {
-        // 修改10: 直接使用成员变量 loginId，避免 NullPointerException
-        if (this.loginId != null) {
-            onlineUsers.remove(this.loginId);
-            String message = MessageUtils.getSysMessage(true, loginId);
-            broadcastAllUsers(message);
-        }
+        onlineUsers.remove(this.loginId);
+        broadcastRemoveMessage(this.loginId);
+    }
+
+    /**
+     * 广播用户离开
+     */
+    private void broadcastRemoveMessage(String removedUserId) {
+        String removeMsg = MessageUtils.getSysMessage("remove", Collections.singleton(removedUserId));
+        onlineUsers.forEach((userId, session) -> {
+            if (session.isOpen()) {
+                try {
+                    session.getBasicRemote().sendText(removeMsg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**

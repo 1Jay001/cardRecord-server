@@ -1,12 +1,15 @@
 package com.thaddeus.common.utils;
 
 import com.alibaba.fastjson.JSON;
-import com.thaddeus.server.ws.pojo.Message;
+import com.alibaba.fastjson2.JSONObject;
 import com.thaddeus.server.ws.pojo.ResultMessage;
 import com.thaddeus.server.ws.pojo.ScoreMessage;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -18,13 +21,16 @@ import java.util.HashMap;
 @Slf4j
 public class MessageUtils {
 
-    public static String getSysMessage(boolean isSystemMessage, Object userId) {
-        ResultMessage resultMessage = new ResultMessage();
-
-        resultMessage.setSystem(isSystemMessage);
-        resultMessage.setOnlineUserList(userId);
-
-        return JSON.toJSONString(resultMessage);
+    public static String getSysMessage(String type, Set<String> userIds) {
+        JSONObject msg = new JSONObject();
+        msg.put("type", type);
+        // init 返回全量列表，add/remove 返回增量列表
+        if ("init".equals(type)) {
+            msg.put("onlineUserList", new ArrayList<>(userIds));
+        } else {
+            msg.put("userIds", new ArrayList<>(userIds));
+        }
+        return msg.toString();
     }
 
 
@@ -53,4 +59,5 @@ public class MessageUtils {
         scoreMessage.setDelta(currentScore);
         return JSON.toJSONString(scoreMessage);
     }
+
 }
